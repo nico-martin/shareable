@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  shareable:
+    build: .
+    ports:
+      - "7777:80"
+    environment:
+      - PORT=80
+      - NODE_ENV=production
+    volumes:
+      # Persist cache across container restarts
+      - ./cache:/app/.cache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Volumes for persistence
+volumes:
+  cache:

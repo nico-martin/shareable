@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shareable Example</title>
+  <script src="http://localhost:7777/library.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .shareable-container {
+      width: 1200px;
+      height: 630px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+    .shareable-title {
+      font-size: 72px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .shareable-description {
+      font-size: 32px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Shareable Example</h1>
+  <p>This is the regular page content that will be visible normally.</p>
+  <p>When you add <code>#render-shareable</code> to the URL, only the template content below will be shown.</p>
+
+  <h2>Try it:</h2>
+  <ul>
+    <li>Open this file in a browser</li>
+    <li>Add <code>#render-shareable</code> to the URL</li>
+    <li>Or use the render endpoint: <code>http://localhost:7777/render?url=http://localhost:7777/example.html</code></li>
+  </ul>
+
+  <!-- This template will be rendered when #render-shareable is in the URL -->
+  <template data-shareable>
+    <div class="shareable-container">
+      <div class="shareable-title">Hello, Shareable!</div>
+      <div class="shareable-description">Generate beautiful preview images from HTML templates</div>
+    </div>
+  </template>
+</body>
+</html>
