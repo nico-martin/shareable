@@ -14,7 +14,7 @@ fi
 # If running as root, switch to pptruser
 if [ "$(id -u)" = "0" ]; then
   echo "Entrypoint: Switching to pptruser..."
-  exec su-exec pptruser "$@"
+  exec gosu pptruser "$@"
 else
   echo "Entrypoint: Already running as non-root, executing command..."
   exec "$@"

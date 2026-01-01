@@ -40,8 +40,8 @@ USER root
 RUN chown -R pptruser:pptruser /app
 RUN chmod -R 777 /app/.cache
 
-# Install su-exec for user switching
-RUN apt-get update && apt-get install -y su-exec && rm -rf /var/lib/apt/lists/*
+# Install gosu for user switching
+RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*
 
 # Copy and setup entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/
