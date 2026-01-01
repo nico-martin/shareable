@@ -1,5 +1,5 @@
 # Use Puppeteer base image which includes Chrome and all dependencies
-FROM ghcr.io/puppeteer/puppeteer:21.6.1
+FROM ghcr.io/puppeteer/puppeteer:24.1.0
 
 # Set working directory
 WORKDIR /app
@@ -22,6 +22,9 @@ RUN npm run build
 
 # Remove dev dependencies
 RUN npm prune --production
+
+# Install Chrome for Puppeteer
+RUN npx puppeteer browsers install chrome
 
 # Create cache directory
 RUN mkdir -p .cache
