@@ -76,19 +76,23 @@ router.get('/render', async (req: Request, res: Response) => {
     // Wait a bit for any animations or dynamic content
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Check if template[data-shareable] exists on the page (unless skipped)
+    // Check if template content was rendered (unless skipped)
+    // Note: library.js removes the template and replaces body content, so we check if body has content
     if (!shouldSkipTemplateCheck) {
-      const hasTemplate = await page.evaluate(() => {
+      const hasContent = await page.evaluate(() => {
         // @ts-ignore - document is available in browser context
-        return document.querySelector('template[data-shareable]') !== null;
+        const bodyText = (document as any).body.innerText.trim();
+        // @ts-ignore
+        const hasElements = (document as any).body.children.length > 0;
+        return bodyText.length > 0 || hasElements;
       });
 
-      if (!hasTemplate) {
-        console.log(`[Render] No template[data-shareable] found on page: ${url}`);
+      if (!hasContent) {
+        console.log(`[Render] No rendered content found on page: ${url}`);
         await browser.close();
         return res.status(404).json({
           error: 'Template not found',
-          message: 'No <template data-shareable> element found on the page'
+          message: 'No content was rendered. Make sure the page has a <template data-shareable> element and library.js is loaded.'
         });
       }
     } else {
