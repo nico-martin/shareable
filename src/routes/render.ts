@@ -7,6 +7,7 @@ import {
   readCache,
   writeCache
 } from '../utils/cache';
+import { isUrlAllowed, getAllowedHosts } from '../utils/hosts';
 
 const router = Router();
 
@@ -16,6 +17,17 @@ router.get('/render', async (req: Request, res: Response) => {
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'URL parameter is required' });
+  }
+
+  // Validate URL is from an allowed host
+  if (!isUrlAllowed(url)) {
+    const allowedHosts = getAllowedHosts();
+    console.log(`[Render] Blocked unauthorized host: ${url}`);
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: 'This URL is not allowed to be rendered',
+      allowedHosts: allowedHosts.length > 0 ? allowedHosts : ['All hosts allowed']
+    });
   }
 
   const shouldRebuild = rebuild === 'true' || rebuild === '1';

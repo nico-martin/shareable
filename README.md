@@ -33,6 +33,10 @@ Server runs on:
 Environment variables (see `.env.example`):
 - `PORT` - Server port (default: 7777 local, 80 in Docker)
 - `NODE_ENV` - Environment mode (development/production)
+- `ALLOWED_HOSTS` - Comma-separated list of allowed URLs/domains to render (e.g., `http://localhost:3000,https://example.com`)
+  - Leave empty or set to `*` to allow all hosts (not recommended for production)
+  - Only URLs matching these hosts will be rendered
+  - Returns `403 Forbidden` for unauthorized hosts
 
 ## How to Use
 
@@ -99,6 +103,7 @@ Returns the minified version of the client-side library (recommended for product
 
 **Response:**
 - `200` - PNG image (1200x630px)
+- `403` - Forbidden (URL host not in allowed hosts list)
 - `404` - Template not found (page has no `<template data-shareable>`)
 - `500` - Server error
 
