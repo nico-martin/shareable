@@ -40,6 +40,9 @@ USER root
 RUN chown -R pptruser:pptruser /app
 RUN chmod -R 777 /app/.cache
 
+# Install su-exec for user switching
+RUN apt-get update && apt-get install -y su-exec && rm -rf /var/lib/apt/lists/*
+
 # Copy and setup entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
@@ -51,6 +54,7 @@ EXPOSE 80
 ENV PORT=80
 ENV NODE_ENV=production
 
+# Stay as root for entrypoint, which will switch to pptruser
 # Use entrypoint to handle permissions then run as pptruser
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["node", "dist/server.js"]
