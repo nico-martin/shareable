@@ -7,13 +7,7 @@ export const CACHE_DIR = path.join(process.cwd(), 'cache');
 // Ensure cache directory exists
 export function initCache(): void {
   if (!fs.existsSync(CACHE_DIR)) {
-    fs.mkdirSync(CACHE_DIR, { recursive: true, mode: 0o777 });
-  }
-  // Ensure the directory is writable
-  try {
-    fs.accessSync(CACHE_DIR, fs.constants.W_OK);
-  } catch (err) {
-    console.warn(`Warning: Cache directory ${CACHE_DIR} is not writable. Cache may not work properly.`);
+    fs.mkdirSync(CACHE_DIR, { recursive: true });
   }
 }
 

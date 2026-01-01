@@ -26,26 +26,17 @@ RUN npm run build
 # Remove dev dependencies
 RUN npm prune --production
 
-# Create cache directory and install Chrome
+# Create cache directory with proper permissions
 RUN mkdir -p /home/pptruser/.cache/puppeteer /app/cache
-RUN chown -R pptruser:pptruser /home/pptruser/.cache /app/cache
+RUN chown -R pptruser:pptruser /home/pptruser/.cache /app/cache /app
 RUN chmod -R 777 /app/cache
 
 # Switch to pptruser to install Chrome
 USER pptruser
 RUN npx puppeteer browsers install chrome
 
-# Switch back to root to set final permissions
-USER root
-RUN chown -R pptruser:pptruser /app
-RUN chmod -R 777 /app/cache
-
-# Install gosu for user switching
-RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*
-
-# Copy and setup entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Switch to non-root user for running the app
+USER pptruser
 
 # Expose port
 EXPOSE 80
@@ -54,7 +45,5 @@ EXPOSE 80
 ENV PORT=80
 ENV NODE_ENV=production
 
-# Stay as root for entrypoint, which will switch to pptruser
-# Use entrypoint to handle permissions then run as pptruser
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# Run the app
 CMD ["node", "dist/server.js"]
