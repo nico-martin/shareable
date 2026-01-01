@@ -40,8 +40,9 @@ USER root
 RUN chown -R pptruser:pptruser /app
 RUN chmod -R 777 /app/.cache
 
-# Switch to non-root user for running the app
-USER pptruser
+# Copy and setup entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expose port
 EXPOSE 80
@@ -50,5 +51,6 @@ EXPOSE 80
 ENV PORT=80
 ENV NODE_ENV=production
 
-# Run the app
+# Use entrypoint to handle permissions then run as pptruser
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["node", "dist/server.js"]
