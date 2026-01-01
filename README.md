@@ -100,6 +100,7 @@ Returns the minified version of the client-side library (recommended for product
 **Parameters:**
 - `url` - The page URL to render
 - `rebuild` - (optional) Set to `true` to bypass cache
+- `skipTemplateCheck` - (optional) Set to `true` to skip template validation (useful for development/testing)
 
 **Response:**
 - `200` - PNG image (1200x630px)
@@ -117,6 +118,9 @@ curl "https://your-domain.com/render?url=https://example.com" -o preview.png
 
 # Force regenerate
 curl "https://your-domain.com/render?url=https://example.com&rebuild=true" -o preview.png
+
+# Skip template check (development/testing)
+curl "https://your-domain.com/render?url=https://example.com&skipTemplateCheck=true" -o preview.png
 ```
 
 ## Caching

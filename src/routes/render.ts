@@ -13,11 +13,13 @@ const router = Router();
 
 // Render endpoint - takes a URL, adds #og, renders in OG size, and returns screenshot
 router.get('/render', async (req: Request, res: Response) => {
-  const { url, rebuild } = req.query;
+  const { url, rebuild, skipTemplateCheck } = req.query;
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'URL parameter is required' });
   }
+
+  const shouldSkipTemplateCheck = skipTemplateCheck === 'true' || skipTemplateCheck === '1';
 
   // Validate URL is from an allowed host
   if (!isUrlAllowed(url)) {
@@ -74,19 +76,23 @@ router.get('/render', async (req: Request, res: Response) => {
     // Wait a bit for any animations or dynamic content
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Check if template[data-shareable] exists on the page
-    const hasTemplate = await page.evaluate(() => {
-      // @ts-ignore - document is available in browser context
-      return document.querySelector('template[data-shareable]') !== null;
-    });
-
-    if (!hasTemplate) {
-      console.log(`[Render] No template[data-shareable] found on page: ${url}`);
-      await browser.close();
-      return res.status(404).json({
-        error: 'Template not found',
-        message: 'No <template data-shareable> element found on the page'
+    // Check if template[data-shareable] exists on the page (unless skipped)
+    if (!shouldSkipTemplateCheck) {
+      const hasTemplate = await page.evaluate(() => {
+        // @ts-ignore - document is available in browser context
+        return document.querySelector('template[data-shareable]') !== null;
       });
+
+      if (!hasTemplate) {
+        console.log(`[Render] No template[data-shareable] found on page: ${url}`);
+        await browser.close();
+        return res.status(404).json({
+          error: 'Template not found',
+          message: 'No <template data-shareable> element found on the page'
+        });
+      }
+    } else {
+      console.log(`[Render] Skipping template check for: ${url}`);
     }
 
     // Take screenshot
