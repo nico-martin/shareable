@@ -27,9 +27,9 @@ RUN npm run build
 RUN npm prune --production
 
 # Create cache directory and install Chrome
-RUN mkdir -p /home/pptruser/.cache/puppeteer /app/.cache
-RUN chown -R pptruser:pptruser /home/pptruser/.cache /app/.cache
-RUN chmod -R 777 /app/.cache
+RUN mkdir -p /home/pptruser/.cache/puppeteer /app/cache
+RUN chown -R pptruser:pptruser /home/pptruser/.cache /app/cache
+RUN chmod -R 777 /app/cache
 
 # Switch to pptruser to install Chrome
 USER pptruser
@@ -38,7 +38,7 @@ RUN npx puppeteer browsers install chrome
 # Switch back to root to set final permissions
 USER root
 RUN chown -R pptruser:pptruser /app
-RUN chmod -R 777 /app/.cache
+RUN chmod -R 777 /app/cache
 
 # Install gosu for user switching
 RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*

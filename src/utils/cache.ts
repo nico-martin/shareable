@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
-export const CACHE_DIR = path.join(process.cwd(), '.cache');
+export const CACHE_DIR = path.join(process.cwd(), 'cache');
 
 // Ensure cache directory exists
 export function initCache(): void {
