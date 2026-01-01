@@ -11,9 +11,10 @@ export function initCache(): void {
   }
 }
 
-// Generate cache key from URL
-export function getCacheKey(url: string): string {
-  return crypto.createHash('md5').update(url).digest('hex');
+// Generate cache key from URL and format
+export function getCacheKey(url: string, format: string = 'og'): string {
+  const cacheString = `${url}_${format}`;
+  return crypto.createHash('md5').update(cacheString).digest('hex');
 }
 
 // Get cache file path

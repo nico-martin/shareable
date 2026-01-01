@@ -66,18 +66,27 @@ Environment variables (see `.env.example`):
 </html>
 ```
 
-### 2. Generate the Image
+### 2. Add Meta Tags to Your Page
 
-```bash
-# Generate shareable image from any URL
-curl "https://your-domain.com/render?url=https://yoursite.com/page" --output preview.png
+Use the render endpoint in your meta tags:
+
+```html
+<head>
+  <!-- Open Graph (Facebook, LinkedIn) -->
+  <meta property="og:image" content="https://your-domain.com/render?url=https://yoursite.com/page" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://your-domain.com/render?url=https://yoursite.com/page&format=twitter" />
+</head>
 ```
 
 That's it! The service will:
 - Open the URL with `#render-shareable` hash appended
 - Extract the `<template data-shareable>` content
-- Render it at 1200x630px
+- Render it at the correct dimensions (1200x630 for OG, 1200x628 for Twitter)
 - Return a PNG screenshot
+- Cache it for subsequent requests
 
 ## API
 
@@ -99,34 +108,57 @@ Returns the minified version of the client-side library (recommended for product
 
 **Parameters:**
 - `url` - The page URL to render
+- `format` - (optional) Image format: `og` (1200x630) or `twitter` (1200x628). Default: `og`
 - `rebuild` - (optional) Set to `true` to bypass cache
 - `skipTemplateCheck` - (optional) Set to `true` to skip template validation (useful for development/testing)
 
 **Response:**
-- `200` - PNG image (1200x630px)
+- `200` - PNG image (dimensions based on format)
 - `403` - Forbidden (URL host not in allowed hosts list)
 - `404` - Template not found (page has no `<template data-shareable>`)
 - `500` - Server error
 
 **Examples:**
-```bash
-# First request - generates and caches
-curl "https://your-domain.com/render?url=https://example.com" -o preview.png
 
-# Second request - instant (from cache)
-curl "https://your-domain.com/render?url=https://example.com" -o preview.png
+```html
+<!-- Open Graph (Facebook, LinkedIn) - 1200x630px -->
+<head>
+  <meta property="og:image" content="https://your-domain.com/render?url=https://yoursite.com/page" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+</head>
 
-# Force regenerate
-curl "https://your-domain.com/render?url=https://example.com&rebuild=true" -o preview.png
+<!-- Twitter Large Card - 1200x628px -->
+<head>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://your-domain.com/render?url=https://yoursite.com/page&format=twitter" />
+</head>
 
-# Skip template check (development/testing)
-curl "https://your-domain.com/render?url=https://example.com&skipTemplateCheck=true" -o preview.png
+<!-- Complete example with all meta tags -->
+<head>
+  <!-- Open Graph -->
+  <meta property="og:title" content="Your Page Title" />
+  <meta property="og:description" content="Your page description" />
+  <meta property="og:image" content="https://your-domain.com/render?url=https://yoursite.com/page" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Your Page Title" />
+  <meta name="twitter:description" content="Your page description" />
+  <meta name="twitter:image" content="https://your-domain.com/render?url=https://yoursite.com/page&format=twitter" />
+
+  <!-- Force regenerate (useful during development) -->
+  <!-- <meta property="og:image" content="https://your-domain.com/render?url=https://yoursite.com/page&rebuild=true" /> -->
+</head>
 ```
 
 ## Caching
 
-- Screenshots are cached in `.cache/` directory
-- Cache key is MD5 hash of the URL
+- Screenshots are cached in `cache/` directory
+- Cache key is MD5 hash of the URL + format
+- Each format (og/twitter) is cached separately
 - Check `X-Cache` header: `HIT` = cached, `MISS` = new
 - Use `?rebuild=true` to force regeneration
 
@@ -146,7 +178,9 @@ See `example.html` for a working demo:
 npm run dev
 # Open http://localhost:7777/example.html in browser
 # Add #render-shareable to URL to see template-only view
-# Or generate: curl "http://localhost:7777/render?url=http://localhost:7777/example.html" -o test.png
+# View generated images:
+#   OG format: http://localhost:7777/render?url=http://localhost:7777/example.html
+#   Twitter format: http://localhost:7777/render?url=http://localhost:7777/example.html&format=twitter
 ```
 
 ## Deployment
@@ -190,7 +224,10 @@ src/
 
 ## Tips
 
-- Template size should be 1200x630px (standard OG image size)
+- Template sizes:
+  - Open Graph (Facebook, LinkedIn): 1200x630px
+  - Twitter summary_large_image: 1200x628px
 - Use inline styles in the template (external CSS won't load)
 - Test with `#render-shareable` hash in browser before generating
 - Keep templates simple for faster rendering
+- Use `format=twitter` for Twitter cards, default `og` for everything else

@@ -13,13 +13,23 @@ const router = Router();
 
 // Render endpoint - takes a URL, adds #og, renders in OG size, and returns screenshot
 router.get('/render', async (req: Request, res: Response) => {
-  const { url, rebuild, skipTemplateCheck } = req.query;
+  const { url, rebuild, skipTemplateCheck, format } = req.query;
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'URL parameter is required' });
   }
 
   const shouldSkipTemplateCheck = skipTemplateCheck === 'true' || skipTemplateCheck === '1';
+
+  // Determine format (og or twitter)
+  const imageFormat = (format === 'twitter' || format === 'og') ? format : 'og';
+
+  // Set dimensions based on format
+  // OG: 1200x630 (standard Open Graph)
+  // Twitter: 1200x628 (summary_large_image)
+  const dimensions = imageFormat === 'twitter'
+    ? { width: 1200, height: 628 }
+    : { width: 1200, height: 630 };
 
   // Validate URL is from an allowed host
   if (!isUrlAllowed(url)) {
@@ -33,19 +43,19 @@ router.get('/render', async (req: Request, res: Response) => {
   }
 
   const shouldRebuild = rebuild === 'true' || rebuild === '1';
-  const cacheKey = getCacheKey(url);
+  const cacheKey = getCacheKey(url, imageFormat);
   const cachePath = getCachePath(cacheKey);
 
   // Check if we have a cached version and don't need to rebuild
   if (!shouldRebuild && cacheExists(cacheKey)) {
-    console.log(`[Cache] Serving cached version for: ${url}`);
+    console.log(`[Cache] Serving cached version for: ${url} (${imageFormat})`);
     const cachedImage = readCache(cacheKey);
     res.setHeader('Content-Type', 'image/png');
     res.setHeader('X-Cache', 'HIT');
     return res.send(cachedImage);
   }
 
-  console.log(`[Cache] Generating new screenshot for: ${url}`);
+  console.log(`[Cache] Generating new screenshot for: ${url} (${imageFormat} ${dimensions.width}x${dimensions.height})`);
   let browser: Browser | undefined;
 
   try {
@@ -57,10 +67,10 @@ router.get('/render', async (req: Request, res: Response) => {
 
     const page = await browser.newPage();
 
-    // Set viewport to OG image size (1200x630 is the standard)
+    // Set viewport based on format
     await page.setViewport({
-      width: 1200,
-      height: 630,
+      width: dimensions.width,
+      height: dimensions.height,
       deviceScaleFactor: 1
     });
 
