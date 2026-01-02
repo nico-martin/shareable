@@ -29,7 +29,6 @@ RUN npm prune --production
 # Create cache directory with proper permissions
 RUN mkdir -p /home/pptruser/.cache/puppeteer /app/cache
 RUN chown -R pptruser:pptruser /home/pptruser/.cache /app/cache /app
-RUN chmod -R 777 /app/cache
 
 # Switch to pptruser to install Chrome
 USER pptruser

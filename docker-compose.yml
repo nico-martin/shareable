@@ -9,8 +9,8 @@ services:
       - PORT=80
       - NODE_ENV=production
     volumes:
-      # Persist cache across container restarts
-      - ./cache:/app/cache
+      # Persist cache across container restarts using named volume
+      - shareable-cache:/app/cache
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
@@ -20,4 +20,5 @@ services:
 
 # Volumes for persistence
 volumes:
-  cache:
+  shareable-cache:
+    driver: local
