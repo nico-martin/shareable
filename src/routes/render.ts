@@ -26,9 +26,9 @@ router.get('/render', async (req: Request, res: Response) => {
 
   // Set dimensions based on format
   // OG: 1200x630 (standard Open Graph)
-  // Twitter: 1200x628 (summary_large_image)
+  // Twitter: 1200x600 (summary_large_image)
   const dimensions = imageFormat === 'twitter'
-    ? { width: 1200, height: 628 }
+    ? { width: 1200, height: 600 }
     : { width: 1200, height: 630 };
 
   // Validate URL is from an allowed host
