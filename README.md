@@ -222,12 +222,3 @@ src/
   └── server.ts         # Main Express application
 ```
 
-## Tips
-
-- Template sizes:
-  - Open Graph (Facebook, LinkedIn): 1200x630px
-  - Twitter summary_large_image: 1200x628px
-- Use inline styles in the template (external CSS won't load)
-- Test with `#render-shareable` hash in browser before generating
-- Keep templates simple for faster rendering
-- Use `format=twitter` for Twitter cards, default `og` for everything else
