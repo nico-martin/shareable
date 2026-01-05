@@ -6,7 +6,7 @@ const router = Router();
 router.get('/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
-    port: parseInt(process.env.PORT || '7777', 10),
+    port: parseInt(process.env.PORT || '3000', 10),
     timestamp: new Date().toISOString()
   });
 });

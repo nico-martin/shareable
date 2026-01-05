@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shareable Example</title>
-  <script src="http://localhost:7777/library.js"></script>
+  <script src="http://localhost:3000/library.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,7 +34,7 @@
     }
   </style>
 </head>
-<body>
+<body style="margin: 0; padding: 0;">
   <h1>Shareable Example</h1>
   <p>This is the regular page content that will be visible normally.</p>
   <p>When you add <code>#render-shareable</code> to the URL, only the template content below will be shown.</p>
@@ -43,7 +43,7 @@
   <ul>
     <li>Open this file in a browser</li>
     <li>Add <code>#render-shareable</code> to the URL</li>
-    <li>Or use the render endpoint: <code>http://localhost:7777/render?url=http://localhost:7777/example.html</code></li>
+    <li>Or use the render endpoint: <code>http://localhost:3000/render?url=http://localhost:3000/example.html</code></li>
   </ul>
 
   <!-- This template will be rendered when #render-shareable is in the URL -->

@@ -2,11 +2,42 @@
 
 Generate beautiful shareable preview images from HTML templates automatically.
 
+- **Framework Agnostic** - Works with React, Vue, vanilla HTML, WordPress, or any CMS/framework - SPA or MPA
+- **Self-Hosted** - Full control over your data and infrastructure, no third-party dependencies
+- **Zero Page Weight** - Templates are hidden from visitors, no impact on your site's performance
+- **Dynamic Content** - Generate unique images per page with custom fonts, layouts, and real-time data
+- **Built-in Caching** - Smart caching system ensures fast response times and reduces server load
+- **Multiple Formats** - Supports both Open Graph (1200x630) and Twitter Card (1200x628) formats
+- **Simple Integration** - Just add a `<template data-shareable>` tag and include a single script
+- **Docker Ready** - Easy deployment with included Docker and docker-compose configurations
+
 > **Note:** This project is heavily influenced by [og:kit](https://ogkit.dev/home). Shareable is an open-source, self-hosted alternative. If you prefer a fully managed hosted solution, check out [og:kit](https://ogkit.dev/home).
 
 ## Example
 
-I have an instance of Shareable running on https://shareable.nico.dev/
+Here's a real-world example using an instance of Shareable running on [shareable.nico.dev](https://shareable.nico.dev/) to generate preview images for [nico.dev](https://nico.dev).
+
+### Generated Image
+
+The service generates this preview image automatically:
+
+![OG Image for nico.dev](http://shareable.nico.dev/render?url=https://nico.dev)
+
+**Image URL:** [http://shareable.nico.dev/render?url=https://nico.dev](http://shareable.nico.dev/render?url=https://nico.dev)
+
+### Template Preview
+
+You can view the template that generates this image by visiting the page with the `#render-shareable` hash:
+
+**Template URL:** [https://nico.dev/#render-shareable](https://nico.dev/#render-shareable)
+
+> **Tip:** Resize your browser to 1200x630px to see exactly what the generated image will look like.
+
+### Implementation Details
+
+nico.dev is a React application. The shareable template is implemented as a React component, but Shareable works with any HTML. It simply extracts and renders the `<template data-shareable>` element from the DOM.
+
+**View the implementation:** [ShareableTemplate.tsx](https://github.com/nico-martin/nico.dev/blob/main/components/ShareableTemplate.tsx)
 
 ## Quick Start
 
@@ -25,17 +56,17 @@ docker-compose up
 
 # Or build and run manually
 docker build -t shareable .
-docker run -p 7777:80 shareable
+docker run -p 3000:80 shareable
 ```
 
 Server runs on:
-- **Local dev**: `http://localhost:7777`
-- **Docker**: `http://localhost:7777` (maps to port 80 in container)
+- **Local dev**: `http://localhost:3000` (default: 3000)
+- **Docker**: `http://localhost:3000` (maps to port 80 in container)
 
 ## Configuration
 
 Environment variables (see `.env.example`):
-- `PORT` - Server port (default: 7777 local, 80 in Docker)
+- `PORT` - Server port (default: 3000 local, 80 in Docker)
 - `NODE_ENV` - Environment mode (development/production)
 - `ALLOWED_HOSTS` - Comma-separated list of allowed URLs/domains to render (e.g., `http://localhost:3000,https://example.com`)
   - Leave empty or set to `*` to allow all hosts (not recommended for production)
@@ -53,7 +84,7 @@ Environment variables (see `.env.example`):
   <!-- Use minified version for production -->
   <script src="https://your-domain.com/library.min.js"></script>
   <!-- Or regular version for development -->
-  <!-- <script src="http://localhost:7777/library.js"></script> -->
+  <!-- <script src="http://localhost:3000/library.js"></script> -->
 </head>
 <body>
   <!-- Your regular page content -->
@@ -113,6 +144,7 @@ Returns the minified version of the client-side library (recommended for product
 **Parameters:**
 - `url` - The page URL to render
 - `format` - (optional) Image format: `og` (1200x630) or `twitter` (1200x628). Default: `og`
+- `version` - (optional) Version string to include in cache key. Changing this value will force a new image to be generated. Useful for cache busting when updating templates
 - `rebuild` - (optional) Set to `true` to bypass cache
 - `skipTemplateCheck` - (optional) Set to `true` to skip template validation (useful for development/testing)
 
@@ -155,16 +187,21 @@ Returns the minified version of the client-side library (recommended for product
 
   <!-- Force regenerate (useful during development) -->
   <!-- <meta property="og:image" content="https://your-domain.com/render?url=https://yoursite.com/page&rebuild=true" /> -->
+
+  <!-- Use version for cache busting (useful when updating templates) -->
+  <!-- <meta property="og:image" content="https://your-domain.com/render?url=https://yoursite.com/page&version=v2.1" /> -->
 </head>
 ```
 
 ## Caching
 
 - Screenshots are cached in `cache/` directory
-- Cache key is MD5 hash of the URL + format
+- Cache key is MD5 hash of: URL + format + version (if provided)
 - Each format (og/twitter) is cached separately
+- Each version creates a separate cache entry
 - Check `X-Cache` header: `HIT` = cached, `MISS` = new
 - Use `?rebuild=true` to force regeneration
+- Use `?version=X` to create version-specific caches (e.g., `version=v1.2.0` or `version=2024-01-05`)
 
 ## Development
 
@@ -174,18 +211,26 @@ npm run build # Compile TypeScript
 npm start     # Run production build
 ```
 
-## Example
+## Local Demo
 
-See `example.html` for a working demo:
+Test Shareable locally with the included `example.html` file:
 
+**1. Start the development server:**
 ```bash
 npm run dev
-# Open http://localhost:7777/example.html in browser
-# Add #render-shareable to URL to see template-only view
-# View generated images:
-#   OG format: http://localhost:7777/render?url=http://localhost:7777/example.html
-#   Twitter format: http://localhost:7777/render?url=http://localhost:7777/example.html&format=twitter
 ```
+
+**2. View the example page:**
+- **Regular view:** `http://localhost:3000/example.html`
+- **Template view:** `http://localhost:3000/example.html#render-shareable`
+
+**3. View generated preview images:**
+- **OG format (1200x630):** `http://localhost:3000/render?url=http://localhost:3000/example.html`
+- **Twitter format (1200x628):** `http://localhost:3000/render?url=http://localhost:3000/example.html&format=twitter`
+
+**4. Test cache behavior:**
+- Add `&rebuild=true` to force regeneration
+- Check the `X-Cache` header: `HIT` (cached) or `MISS` (newly generated)
 
 ## Deployment
 
@@ -201,7 +246,7 @@ services:
   shareable:
     build: .
     ports:
-      - "7777:80"  # Host:Container
+      - "3000:80"  # Host:Container (set PORT env var or uses default 3000)
     environment:
       - PORT=80
     volumes:
@@ -210,18 +255,3 @@ services:
 ```
 
 Run with: `docker-compose up -d`
-
-## Project Structure
-
-```
-src/
-  ├── routes/
-  │   ├── library.ts    # Library.js endpoints (regular & minified)
-  │   ├── render.ts     # Screenshot generation endpoint
-  │   └── health.ts     # Health check endpoint
-  ├── utils/
-  │   └── cache.ts      # Cache management utilities
-  ├── public/
-  │   └── library.js    # Client-side shareable template renderer
-  └── server.ts         # Main Express application
-```

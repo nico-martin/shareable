@@ -13,7 +13,7 @@ const router = Router();
 
 // Render endpoint - takes a URL, adds #og, renders in OG size, and returns screenshot
 router.get('/render', async (req: Request, res: Response) => {
-  const { url, rebuild, skipTemplateCheck, format } = req.query;
+  const { url, rebuild, skipTemplateCheck, format, version } = req.query;
 
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'URL parameter is required' });
@@ -43,7 +43,8 @@ router.get('/render', async (req: Request, res: Response) => {
   }
 
   const shouldRebuild = rebuild === 'true' || rebuild === '1';
-  const cacheKey = getCacheKey(url, imageFormat);
+  const versionParam = typeof version === 'string' ? version : undefined;
+  const cacheKey = getCacheKey(url, imageFormat, versionParam);
   const cachePath = getCachePath(cacheKey);
 
   // Check if we have a cached version and don't need to rebuild
