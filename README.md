@@ -4,6 +4,10 @@ Generate beautiful shareable preview images from HTML templates automatically.
 
 > **Note:** This project is heavily influenced by [og:kit](https://ogkit.dev/home). Shareable is an open-source, self-hosted alternative. If you prefer a fully managed hosted solution, check out [og:kit](https://ogkit.dev/home).
 
+## Example
+
+I have an instance of Shareable running on https://shareable.nico.dev/
+
 ## Quick Start
 
 ### Local Development
@@ -221,4 +225,3 @@ src/
   │   └── library.js    # Client-side shareable template renderer
   └── server.ts         # Main Express application
 ```
-
